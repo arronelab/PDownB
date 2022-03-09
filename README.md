@@ -9,5 +9,7 @@ The criteria for PDB sampling were:
 - RFree between 0-0.25
 - Chain length 30 - 300 residues
 - No ligands
-- Minimum 2 alpha helices (is this too low??)
+- Minimum 2 alpha helices
 - Remove redundancy by using representative structures at 70 % sequence identity (i.e. use one structure to represent all lysozymes).
+
+The search produced **2367 entries** for which the coordinate (pdb) files were downloaded for analysis.
