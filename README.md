@@ -4,7 +4,7 @@ The RCSB PDB was searched for crystal structures to sample. Crystal structures w
 
 The criteria for PDB sampling were:
 
--Resolution > 2 Å
+- Resolution > 2 Å
 -RWork between 0-0.20
 -RFree between 0-0.25
 -Chain length 30 - 300 residues
