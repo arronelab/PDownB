@@ -22,4 +22,4 @@ The search produced **2367 entries** for which the coordinate (pdb) files were d
 - **curvature_torsion_calculator.py**: the script used to calculate the curvature-torsion distribution of the proteins in **PDB**. *Requires [pandas](https://pandas.pydata.org/) and [Biopython](https://biopython.org/).*
 - **curvature_torsion_analysis.csv**: the output of **curvature_torsion_calculator.py** in the format: *Chain* | *Subsection* | *Curvature* | *Torsion*
 
-It is possible to get distributions 
+It is possible to get distributions for each secondary structure element using [DSSP](https://swift.cmbi.umcn.nl/gv/dssp/). If this is something you are interested in then please get in touch for more details.
