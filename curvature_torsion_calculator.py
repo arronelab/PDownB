@@ -85,7 +85,7 @@ def get_ct_distribution():
                         try:
                             to_add = {
                                 'Chain' : chain_name,
-                                'Chunk' : chunk_no,
+                                'Subsection' : chunk_no,
                                 'Curvature' : get_curvature(subsection),
                                 'Torsion' : get_torsion(subsection)
                                 }
@@ -100,8 +100,8 @@ def get_ct_distribution():
         output = pd.DataFrame(output_dicts_list)
         output.to_csv('curvature_torsion_analysis.csv', index=False)
         return output.head()
-
-                
+    
+print(get_ct_distribution())
                     
                     
             
