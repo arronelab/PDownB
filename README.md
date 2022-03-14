@@ -27,3 +27,5 @@ It is possible to get distributions for each secondary structure element using [
 **c++Molecule** contains the code to make many predictions from one input file (currently human_SMARCAL1). There are two options, many predictions that are each one change from the input, or many predictions that are cumulative changes from the input. Compile the scripts using `sh makeFileChanges.sh` and `sh makeFileOneChange.sh`. You will then have two executables "oneChanges" and "nChange".
 - To run **oneChange**: In the file **getPredictionsOneChange.sh** set the number of predictions you want in the loop `for i in {1..n}`, this should currently be 10. Then run `sh getPredictionsOneChange.sh human_SMARCAL1 testname` with your chosen testname.
 - To run **nChanges**: In the file **getPredictionsChanges.sh** set the number of predictions you want in the variable `NoSteps`, this should currently be 10. Then run `sh getPredictionsChanges.sh human_SMARCAL1 testname` with your chosen testname.
+
+Note you will need to download the whole directory c++Molecule for this to run smoothly. 
