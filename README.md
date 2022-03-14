@@ -23,3 +23,6 @@ The search produced **2367 entries** for which the coordinate (pdb) files were d
 - **curvature_torsion_analysis.csv**: the output of **curvature_torsion_calculator.py** in the format: *Chain* | *Subsection* | *Curvature* | *Torsion*
 
 It is possible to get distributions for each secondary structure element using [DSSP](https://swift.cmbi.umcn.nl/gv/dssp/). If this is something you are interested in then please get in touch for more details.
+
+**c++Molecule** contains the code to make many predictions from one input file. There are two options: many predictions that are each one change from the input, or many predictions that are cumulative changes from the input. Compile the scripts using "sh makeFileChanges.sh" and "sh makeFileOneChange.sh". You will then have two executables "oneChanges" and "nChange". To run **oneChange**
+`sh getPredictionsOneChange.sh molname testname`
