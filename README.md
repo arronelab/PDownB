@@ -33,4 +33,4 @@ It is possible to get distributions for each secondary structure element using [
 - You will now have a file **projectname_config.sh**. You are now ready to make predictions with ```sh projectname_config.sh```.
 - This will create a subdirectory in *newFitData/human_SMARCAL1* with the same name as your project name, and populate it with as many coordinate files as you decided above in (iii).
 
-Note you will need to download the whole directory c++Molecule for this to run smoothly. 
+*Note you will need to download the whole directory c++Molecule for this to run smoothly.*
