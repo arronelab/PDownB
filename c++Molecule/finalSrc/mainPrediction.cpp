@@ -5,18 +5,15 @@
 
 
 /***********************************************
-  argv[1] scattering data file
-  argv[2] sequence file
-  argv[3] initial prediction coords  file (can be empty)
-  argv[4] paired distances file (can be empty)
-  argv[5] fixed sections file (again can be empty)
-  argv[6] crystal symmetry file again can be empty
-  argv[7] request to apply hydrophobic covering WITHIN monomers will be a list of sections on which to apply it. Will say none if not.
-  argv[8] request to apply hydrophobic covering BETWEEN monomers will be a list of pairs to try to hydropobically pair. Will say none if not.
-  argv[9] kmin
-  argv[10] kmax
-  argv[11] Number of steps
-  argv[12] prediction file 
+  argv[1] sequence file
+  argv[2] initial prediction coords  file (can be empty)
+  argv[3] paired distances file (can be empty)
+  argv[4] fixed sections file (again can be empty)
+  argv[5] crystal symmetry file again can be empty
+  argv[6] request to apply hydrophobic covering WITHIN monomers will be a list of sections on which to apply it. Will say none if not.
+  argv[7] request to apply hydrophobic covering BETWEEN monomers will be a list of pairs to try to hydropobically pair. Will say none if not.
+  argv[8] Max number of fitting steps
+  argv[9] prediction file 
  **********************************************/
 
 bool checkTransition(double &chiSqVal,double &chiSqCurr,double &uniformProb,int index,int &maxSteps){
@@ -27,7 +24,7 @@ bool checkTransition(double &chiSqVal,double &chiSqCurr,double &uniformProb,int 
     tempFrac=0.0000000001;
   }
   double annealProb;
-  double tempVal;
+  double tempVal; 
   if(chiSqVal<chiSqCurr){
     annealProb=1.0;
   }else{
@@ -65,24 +62,29 @@ int main( int argc, const char* argv[] )
    *************************************/
 
   ktlMolecule mol;
-  if(strcmp(argv[3],"no_initial_prediction")==0){
+  std::cout<<argv[2]<<"\n";
+  if(strcmp(argv[2],"no_initial_prediction")==0){
     // read in from sequernce and sc structure pred
-    mol.readInSequence(argv[2],rmin,rmax,lmin);
+    std::cout<<"here?\n";
+    mol.readInSequence(argv[1],rmin,rmax,lmin);
     // generate random start (with no overlap)
+    //std::cout<<"here ?\n";
     mol.getRandomMolecule();
-    mol.writeMoleculeToFile("testMol.dat");
+     std::cout<<" made random mol ?\n";
+     // mol.writeMoleculeToFile("testMol.dat");
     // identify hydrophobic residues
     mol.getHydrophobicResidues();
   }else{
     // read in from sequernce and sc structure pred
-    mol.readInSequence(argv[2],rmin,rmax,lmin);
-    // read in coordinates
-    mol.readInCoordinates(argv[3]);
+    mol.readInSequence(argv[1],rmin,rmax,lmin);
+    // read in coordinates 
+    mol.readInCoordinates(argv[2]);
     //here would be the filling in missing section routine
     // identify hydrophobic residues
-    mol.writeMoleculeToFile("testMol.dat");
+    //mol.writeMoleculeToFile("testMol.dat");
     mol.getHydrophobicResidues();
   }
+  
   bool doAll = false;
   /*********************************
    
@@ -90,12 +92,12 @@ int main( int argc, const char* argv[] )
    
    ********************************************/
   std::vector<int> fixedSecList;
-   if(strcmp(argv[5],"none")==0){
+   if(strcmp(argv[4],"none")==0){
     // here we make no restrictions
     doAll =true;
   }else{
     std::ifstream fixedSecFile;
-    fixedSecFile.open(argv[5]);
+    fixedSecFile.open(argv[4]);
     std::string line;int index;
     if(fixedSecFile.is_open()){
       while(!fixedSecFile.eof()){
@@ -105,6 +107,7 @@ int main( int argc, const char* argv[] )
 	fixedSecList.push_back(index);
       }
     }else{
+      std::cout<<"failed to open fixed section file\n";
     }
     fixedSecFile.close();
   }
@@ -117,13 +120,15 @@ int main( int argc, const char* argv[] )
 
   //read in the internal hydrophobic list
   std::vector<int> internalHydrophicChecklist;
-  if(strcmp(argv[7],"none")==-1){
-    for(const char* it=argv[7];*it;++it){
+  if(strcmp(argv[6],"none")==-1){
+    for(const char* it=argv[6];*it;++it){
+      std::cout<<*it-'0'<<"\n";
       internalHydrophicChecklist.push_back(*it-'0');
     }
   }
+
   // enforce any requested hyrdophobic covering
-  // std::cout<<" any hydro aminos ? "<<internalHydrophicChecklist.size()<<"\n";
+  std::cout<<" any hydro aminos ? "<<internalHydrophicChecklist.size()<<"\n";
   for(int i=0;i<internalHydrophicChecklist.size();i++){
     // start random genrator
     std::random_device rdev{};
@@ -133,6 +138,7 @@ int main( int argc, const char* argv[] )
     int noHydrationCoverSteps=100;
     // get initial hydration value first choose no of neighbours to check for nearest distances
     int noNeighbours =10;
+    std::cout<<"here a ?\n";
     double  currGlobalRad = mol.getGlobalRadiusOfCurvatureWithinSec(internalHydrophicChecklist[i],noNeighbours);
     double globalRadFit = 0.01*(currGlobalRad-7.5)*(currGlobalRad-7.5);
     std::vector<double> ovelps = mol.checkOverlapWithRad(closestApproachDist,internalHydrophicChecklist[i]); 
@@ -141,9 +147,11 @@ int main( int argc, const char* argv[] )
       distSum = distSum +  std::abs(closestApproachDist-ovelps[l]);
     }   
     globalRadFit =globalRadFit + 0.01*distSum;
+    std::cout<<"initial "<<currGlobalRad<<" "<<globalRadFit<<"\n";
     int k=0;
     // now  
     while(k<noHydrationCoverSteps && globalRadFit>0.0001){
+      std::cout<<k<<" "<<currGlobalRad<<" "<<globalRadFit<<" "<<mol.getSubsecSize(internalHydrophicChecklist[i])<<"\n";
       for(int j=0;j<mol.getSubsecSize(internalHydrophicChecklist[i]);j++){
 	ktlMolecule molCopy = mol;
 	molCopy.changeMoleculeSingleMulti(j,internalHydrophicChecklist[i]);
@@ -155,6 +163,7 @@ int main( int argc, const char* argv[] )
 	  distSum = distSum + std::abs(closestApproachDist-ovelps[l]);
 	}   
         newGlobalRadFit =newGlobalRadFit + 0.01*distSum;
+        //std::cout<<j<<" "<<currGlobalRad<<" "<<newGlobalRadFit<<" "<<globalRadFit<<"\n";
         double uProb = distributionR(generator1);
 	if(checkTransition(newGlobalRadFit,globalRadFit,uProb,k,noHydrationCoverSteps)){
 	  currGlobalRad = newGlobalRad;
@@ -165,16 +174,16 @@ int main( int argc, const char* argv[] )
       k++;
     }
   }
-  std::string start = "start.dat";
-  std::string start_flname = argv[12] + start;
-  mol.writeMoleculeToFile(start_flname.c_str());
+  
+  mol.writeMoleculeToFile(argv[9]);
 
   /******************************************
 
      read in the scattering and set up the scattering model
 
    ******************************************/
-  experimentalData ed(argv[1]);
+
+  //experimentalData ed(argv[1]);
   
   /*
    ed.generatePR();
@@ -201,7 +210,7 @@ int main( int argc, const char* argv[] )
   hydrationShell.constructInitialState();
   hydrationShell.allOverlap();
 
-  hydrationShell.writeHydrationShellToFile("testLyzScat.dat");
+  // hydrationShell.writeHydrationShellToFile("testLyzScat.dat");
   
   
   /********************************************
@@ -211,7 +220,7 @@ int main( int argc, const char* argv[] )
    *******************************************/
 
   // contact predictions or similar distance constraints
-  mol.loadContactPredictions(argv[4]);
+  mol.loadContactPredictions(argv[3]);
   
   // To do: crystal symmetry
   
@@ -229,6 +238,7 @@ int main( int argc, const char* argv[] )
 
   molDists = mol.getDistSet();
   int molSize = mol.getNoAminos();
+  // std::cout<<"mol size? "<<molSize<<" "<<molDists.size()<<"\n";
   std::sort(molDists.begin(),molDists.end());
    
   // get solvent molecules
@@ -250,14 +260,17 @@ int main( int argc, const char* argv[] )
   std::vector<double> solMolDists = mol.solMolDists(solpts);
   std::sort(solMolDists.begin(),solMolDists.end());
   // set the phases of the scattering model
+  //
+  //double  kmin = std::atof(argv[9]);
+  //double  kmax = std::atof(argv[10]);
   
-  double  kmin = std::atof(argv[9]);
-  double  kmax = std::atof(argv[10]);
+  //int noDistBins = int(1.1*std::ceil((kmax-kmin)*maxDist/3.14159265359));
+  //ed.setPhases(maxDist,kmin,kmax);
   
-  int noDistBins = int(1.1*std::ceil((kmax-kmin)*maxDist/3.14159265359));
-  ed.setPhases(maxDist,kmin,kmax);
-  double scatterFit = ed.fitToScattering(molDists,solDists,solMolDists,molSize,noSol);
+  //double scatterFit = ed.fitToScattering(molDists,solDists,solMolDists,molSize,noSol);
   //check for overlaps
+  //std::cout<<"inital scatter "<<scatterFit<<"\n";
+
   double distSumCurr=0.0;
   for(int l=0;l<overlapDists.size();l++){
     distSumCurr = distSumCurr + std::exp(std::abs(closestApproachDist-overlapDists[l]))-1.0;
@@ -266,60 +279,60 @@ int main( int argc, const char* argv[] )
     distSumCurr =0.1*(1.0/overlapDists.size())*distSumCurr;
   }
   double distSum=0.0;
-  scatterFit =scatterFit + distSumCurr;
-  scatterFit =scatterFit + mol.getLennardJonesContact();
+  //scatterFit =scatterFit + distSumCurr;
+  //std::cout<<"inital scatter2 "<<scatterFit<<"\n";
+  //scatterFit =scatterFit + mol.getLennardJonesContact();
   /******************************************************************
   
                       Fit to scattering data
   
-  ******************************************************************/ 
+  ******************************************************************/
+  //ed.writeScatteringToFile(molDists,solDists,solMolDists,molSize,noSol,argv[13]);
+
+  /****************************************************************************
+    
+    Main algorithm 
+   ***************************************************************************/
+  
   int k=0;
   int noSections = mol.noChains();
-  int noScatterFitSteps=std::atoi(argv[11]);
-  std::cout<<"No. chains "<<noSections<<"\n";
-  while(k<noScatterFitSteps && scatterFit>0.0001){
+  int noScatterFitSteps=std::atoi(argv[8]);
+  std::cout<<"no chains "<<noSections<<" "<<noScatterFitSteps<<"\n";
+  while(k<noScatterFitSteps){
     // start random genrator
     std::random_device rdev{};
     std::default_random_engine generator1{rdev()};
     std::uniform_real_distribution<double> distributionR(0.0,1.0);
     // select max number of steps
     // check for overlap
-    // now
+    // now  
+    std::cout<<k<<"\n";
     int netIndex=0;
-    for(int i=1;i<=noSections;i++){
+     for(int i=1;i<=noSections;i++){
       if(i>1){
-	netIndex=netIndex+mol.getSubsecSize(i-1);
+	  netIndex=netIndex+mol.getSubsecSize(i-1);
       }
+      //std::cout<<"size of section "<<i<<" is "<<mol.getSubsecSize(i)<<"\n";
       for(int j=0;j<mol.getSubsecSize(i)-1;j++){
 	int totalIndex = netIndex+j;
 	if((doAll==true) || (std::find(fixedSecList.begin(),fixedSecList.end(),totalIndex)!=fixedSecList.end())){
+	  std::cout<<" section "<<totalIndex<<" of unit "<<i<<" "<<" sub set number "<<totalIndex-netIndex<<" being altered "<<mol.getSubsecSize(i)<<"\n";
 	  ktlMolecule molCopy = mol;
-	  molCopy.changeMoleculeSingleMulti(totalIndex,i);
-	  bool cacaDist= molCopy.checkCalphas(i);
+	  int indexCh = totalIndex-netIndex;
+	  molCopy.changeMoleculeSingleMulti(indexCh,i);
+	  bool cacaDist=molCopy.checkCalphas(i);
 	  if(cacaDist==false){
-	    // get molecule distances
-	    std::vector<double> molDistsCopy;
-	    std::vector<double> ovelaps = molCopy.checkOverlapWithRad(closestApproachDist);   
-	    molDistsCopy = molCopy.getDistSet();
-	    std::sort(molDistsCopy.begin(),molDistsCopy.end()); 
-	    distSum=0.0;
-	    for(int l=0;l<ovelaps.size();l++){
-	      distSum = distSum + std::exp(abs(closestApproachDist-ovelaps[l]))-1.0;
+	      mol=molCopy;
+		    molDists = molDistsCopy;
+		    distSumCurr = distSum;
 	    }
-	    if(ovelaps.size()>0){
-	      distSum = 0.1*distSum*(1.0/ovelaps.size());
-	    }       
-	    mol = molCopy;
-	    molDists = molDistsCopy;
-	    distSumCurr = distSum;
 	  }
-	}
       }
-    std::string k_string = std::to_string(k+1);
-    std::string tmp_flname = argv[12] + k_string + ".dat";
-    mol.writeMoleculeToFile(tmp_flname.c_str());
-    k++;
+      k++;
     }
   }
+  
+   mol.writeMoleculeToFile(argv[9]);
+  
 }
       

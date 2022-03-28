@@ -1,4 +1,5 @@
 
+
 #include "ktlMoleculeRandom.h"
 
 ktlMolecule::ktlMolecule(){
@@ -721,7 +722,9 @@ void ktlMolecule::readInSequence(const char* filename,double &rmin,double &rmax,
 	      for(int j=0;j<aminoType.size();j++){
 		aminoTypeSub.push_back(aminoType[j]);
 		currSize++;
-		if ((((aminoType[j]=="G" || aminoType[j]=="P")&& (j>2 && j<(aminoType.size()-3))) &&currSize>3) || (j==aminoType.size()-1) ){
+		//helix breaker, currently removed
+		//if ((((aminoType[j]=="G" || aminoType[j]=="P")&& (j>2 && j<(aminoType.size()-3))) &&currSize>3) || (j==aminoType.size()-1) ){
+		if(j==aminoType.size()-1){
 		  std::pair<std::string,int> stpr;
 		  stpr.first = prevType;stpr.second = j-currLower+1;
 		  currLower=j+1;
@@ -730,7 +733,7 @@ void ktlMolecule::readInSequence(const char* filename,double &rmin,double &rmax,
 		  distChanges.push_back(0.0);
 		  aminoTypeSub.clear();
 		  currSize=0;
-		}
+		  }
 	      }
 	      prevType=type;
 	      aminoType.clear();

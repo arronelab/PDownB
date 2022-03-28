@@ -2871,7 +2871,7 @@ double randomMol::getMaxDistChange(std::vector<point> &oldPts,std::vector<point>
   std::vector<point> newSection;
   double maxDist;
   std::string type = molDat[index].first;
-  //std::cout<<"section type "<<type<<"\n";
+  std::cout<<"section type "<<type<<"\n";
   if(index>0){
     std::string prevType = molDat[index-1].first;
     if(type == prevType){
