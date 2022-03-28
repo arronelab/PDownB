@@ -322,9 +322,7 @@ int main( int argc, const char* argv[] )
 	  molCopy.changeMoleculeSingleMulti(indexCh,i);
 	  bool cacaDist=molCopy.checkCalphas(i);
 	  if(cacaDist==false){
-	      mol=molCopy;
-		    molDists = molDistsCopy;
-		    distSumCurr = distSum;
+	      mol = molCopy;
 	    }
 	  }
       }
