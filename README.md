@@ -24,8 +24,13 @@ The search produced **2367 entries** for which the coordinate (pdb) files were d
 
 It is possible to get distributions for each secondary structure element using [DSSP](https://swift.cmbi.umcn.nl/gv/dssp/). If this is something you are interested in then please get in touch for more details.
 
-**c++Molecule** contains the code to make many predictions from one input file (currently human_SMARCAL1). There are two options, many predictions that are each one change from the input, or many predictions that are cumulative changes from the input. Compile the scripts using `sh makeFileChanges.sh` and `sh makeFileOneChange.sh`. You will then have two executables "oneChanges" and "nChange".
-- To run **oneChange**: In the file **getPredictionsOneChange.sh** set the number of predictions you want in the loop `for i in {1..n}`, this should currently be 10. Then run `sh getPredictionsOneChange.sh human_SMARCAL1 testname` with your chosen testname.
-- To run **nChanges**: In the file **getPredictionsChanges.sh** set the number of predictions you want in the variable `NoSteps`, this should currently be 10. Then run `sh getPredictionsChanges.sh human_SMARCAL1 testname` with your chosen testname.
+**c++Molecule** contains the code to make many predictions from one input file (currently human_SMARCAL1).
+- You will first need to compile this code by running ```sh makeFileFinalPrediction.sh```. This should produce an executable called **predictStructure**.
+- To run this executable, first make the config file by running ```python makePredictionFile.py```. You will be asked for three inputs:
+  1. First, a project name. *e.g.* 2Changes4Times
+  2. Next, the number of changes from the initial structure. This is the number of times the algorithm will run through the molecule and make changes to the whole structure. *e.g.* 2 as per the project name. *Note this is changes to the whole structure, that is if you choose to make just one change, it is each atom that will be changed once, not just one atom.* 
+  3. Finally, the number of times you'd like to perform this. *e.g.* 4 as per the project name. *Note this is the number of times you go from the initial structure, and make the number of changes defined above. This is therefore the number of output files you will get.*
+- You will now have a file **projectname_config.sh**. You are now ready to make predictions with ```sh projectname_config.sh```.
+- This will create a subdirectory **newFitData/human_SMARCAL1/projectname**, and populate it with as many coordinate files as you decided above in (iii).
 
-Note you will need to download the whole directory c++Molecule for this to run smoothly. 
+*Note you will need to download the whole directory c++Molecule for this to run smoothly.*
