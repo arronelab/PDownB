@@ -31,7 +31,6 @@ It is possible to get distributions for each secondary structure element using [
   2. Next, enter the number of changes from the initial structure. This is the number of times the algorithm will run through the molecule and make changes to the whole structure. E.g. 2 as per the project name. *Note this is changes to the whole structure, that is if you choose to make just one change, it is each atom that will be changed once, not just one atom.* 
   3. Finally, entre the number of times you'd like to perform this. E.g. 4 as per the project name. *Note this is the number of times you go from the initial structure, and make the number of changes defined above This is therefore the number of output curves you will get.*
 - You will now have a file **projectname_config.sh**, E.g. **2Changes4Times_config.sh**. You are now ready to make predictions with ```sh projectname_config.sh```.
-- This will create a subdirectory in *newFitData/human_SMARCAL1* with your project name, and populate it with coordinate files *mol`i`.dat* for i between 1 and the number you decided above in 3.
-
+- This will create a subdirectory in *newFitData/human_SMARCAL1* with the same name as your project name, and populate it with as many coordinate files as you decided above in step 3.
 
 Note you will need to download the whole directory c++Molecule for this to run smoothly. 
