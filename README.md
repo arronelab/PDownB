@@ -25,6 +25,8 @@ The search produced **2367 entries** for which the coordinate (pdb) files were d
 It is possible to get distributions for each secondary structure element using [DSSP](https://swift.cmbi.umcn.nl/gv/dssp/). If this is something you are interested in then please get in touch for more details.
 
 **c++Molecule** contains the code to make many predictions from one input file (currently human_SMARCAL1).
-- You will first need to compile this code by running ```sh makeFileFinalPrediction```
+- You will first need to compile this code by running ```sh makeFileFinalPrediction```. This should produce an executable called **predictStructure**.
+- To run this executable, you first make the config file by running ```python makePredictionFile```.
+  1. First
 
 Note you will need to download the whole directory c++Molecule for this to run smoothly. 
