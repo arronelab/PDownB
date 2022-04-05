@@ -41,26 +41,33 @@ def chunker(list_in, chunk_size):
             pass
     return output
 
-### We define the curvature as the scalar product of consecutive unit
-### tangent vectors T_i . T_{i+1}
-
 def get_curvature(chunk):
-    Ti = normalise(chunk[1]['CA'].get_coord() - chunk[0]['CA'].get_coord())
-    Tip1 = normalise(chunk[2]['CA'].get_coord() - chunk[1]['CA'].get_coord())
-    curvature = np.dot(Ti,Tip1)
+    # get midpoints #
+    mp1 = (chunk[1]['CA'].get_coord() + chunk[0]['CA'].get_coord())/2
+    mp2 = (chunk[2]['CA'].get_coord() + chunk[1]['CA'].get_coord())/2
+    mp3 = (chunk[3]['CA'].get_coord() + chunk[2]['CA'].get_coord())/2
+    # get sin(theta) from ||u x v || = ||u||||v||sin(theta) #
+    u = mp1 - mp2
+    v = mp2 - mp3
+    cross = np.cross(u,v)
+    magcross = magnitude(cross)
+    magu = magnitude(u)
+    magv = magnitude(v)
+    sintheta = magcross/(magu*magv)
+    curvature = (2*np.absolute(sintheta))/magu
     return curvature
 
-### We define the torsion as the sclar product of the plane normals given by
-### the cross product of pairs of consecutive unit tangent vectors.
-### i.e (T_i x T_{i+1}) . (T_{i+1} x T_{i+2})
-
 def get_torsion(chunk):
-    Ti = normalise(chunk[1]['CA'].get_coord() - chunk[0]['CA'].get_coord())
-    Tip1 = normalise(chunk[2]['CA'].get_coord() - chunk[1]['CA'].get_coord())
-    Tip2 = normalise(chunk[3]['CA'].get_coord() - chunk[2]['CA'].get_coord())
-    Ni = np.cross(Ti,Tip1)
-    Nip1 = np.cross(Tip1,Tip2)
-    torsion = np.dot(Ni,Nip1)
+    u = chunk[1]['CA'].get_coord() - chunk[0]['CA'].get_coord()
+    v = chunk[2]['CA'].get_coord() - chunk[1]['CA'].get_coord()
+    w = chunk[3]['CA'].get_coord() - chunk[2]['CA'].get_coord()
+    n1 = normalise(np.cross(u,v))
+    n2 = normalise(np.cross(v,w))
+    theta = np.arccos(np.dot(n1,n2))
+    if np.dot(np.cross(n1,n2),v) < 0:
+        theta*=-1
+    seglength = (magnitude(u)+magnitude(v)+magnitude(w))/3
+    torsion = (2/length)*np.sin(theta/2)))
     return torsion
 
 ### The following will run through the PDB files, and compute the curvature 
@@ -79,7 +86,7 @@ def get_ct_distribution():
                     total_chains += 1
                     chain_name = name + '_chain_' + chain.get_id()
                     chain = strip_water(chain)
-                    chunked_chain = chunker(chain,4)
+                    chunked_chain = chunker(chain,3)
                     chunk_no = 0
                     for subsection in chunked_chain:
                         try:
@@ -90,7 +97,6 @@ def get_ct_distribution():
                                 'Torsion' : get_torsion(subsection)
                                 }
                             output_dicts_list.append(to_add)
-                            print(to_add)
                             chunk_no+=1
                         except:
                             chunk_no+=1
@@ -100,8 +106,6 @@ def get_ct_distribution():
         output = pd.DataFrame(output_dicts_list)
         output.to_csv('curvature_torsion_analysis.csv', index=False)
         return output.head()
-    
-print(get_ct_distribution())
                     
                     
             
