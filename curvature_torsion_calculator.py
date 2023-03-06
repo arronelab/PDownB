@@ -86,7 +86,7 @@ def get_ct_distribution():
                     total_chains += 1
                     chain_name = name + '_chain_' + chain.get_id()
                     chain = strip_water(chain)
-                    chunked_chain = chunker(chain,3)
+                    chunked_chain = chunker(chain,4)
                     chunk_no = 0
                     for subsection in chunked_chain:
                         try:
